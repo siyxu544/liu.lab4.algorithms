@@ -1,0 +1,19 @@
+Package: liu.lab4.algorithms
+Type: Package
+Title: An R Implementation of a multiple linear regression model
+Version: 1.0.0
+Authors@R: c(
+    person(given = "Siyuan", family = "Xu", email = "ningschue@gmail.com", role = c("aut", "cre")),
+    person(given = "Mohan", family = "Zhang", email = "mohzh143@student.liu.se", role = c("aut")),
+    person(given = "Chenzhi", family = "Ni", email = "cheni622@student.liu.se", role = c("aut"))
+  )
+Description: This package provides R implementations of a multiple linear regression model.
+    This package was created as a group assignment submission for the lab 4
+    in the course 732A94 Advanced R Programming at Linköping University.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+RoxygenNote: 7.3.2
+Config/testthat/edition: 3
