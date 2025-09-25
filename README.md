@@ -2,6 +2,7 @@
 # liu.lab4.algorithms
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/siyxu544/liu.lab4.algorithms/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/siyxu544/liu.lab4.algorithms/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of liu.lab4.algorithms is to provide an R implementation of a multiple linear regression mode. This package was created for Lab 4 in the course 732A94 Advanced R Programming at Linköping University.
