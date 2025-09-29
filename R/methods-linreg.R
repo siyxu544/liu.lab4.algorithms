@@ -228,9 +228,9 @@ plot.linreg <- function(x, ...) {
 
   plot2 <- ggplot(data = plot_data, aes(x = .data$fitted_values, y = .data$sqrt_std_res)) +
     geom_point(shape = 1, size = 3) +
-    geom_hline(yintercept = 0,
-               linetype = "dotted",
-               color = "grey40") +
+    #    geom_hline(yintercept = 0,
+    #               linetype = "dotted",
+    #          color = "grey40") +
     geom_smooth(
       method = "loess",
       se = FALSE,
