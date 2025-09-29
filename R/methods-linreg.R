@@ -4,8 +4,8 @@
 #' @param ... further arguments passed to or from other methods (ignored in this method).
 #' @return The original `linreg` object (returned invisibly).
 #' @examples
-#' linreg_mod <- linreg(formula = Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
-#' print(linreg_mod)
+#' model <- linreg(formula = Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
+#' print(model)
 #' @export
 print.linreg <- function(x, ...) {
   cat("Call:\n")
@@ -15,6 +15,125 @@ print.linreg <- function(x, ...) {
   invisible(x)
 }
 
+#' Extract Model Residuals
+#' @description Extracts the vector of residuals from a model object of class "linreg".
+#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param ... Further arguments passed to or from other methods (ignored).
+#' @return A named numeric vector containing the residual values (y - ŷ).
+#' @examples
+#' # Create a linreg model
+#' model <- linreg(Petal.Length ~ Sepal.Length, data = iris)
+#' # Extract the residuals
+#' residuals(model)
+#' @export
+residuals.linreg <- function(x, ...) {
+  return(x$e_hat[, 1])
+}
+
+#' Generic function for model predictions
+#' This is a generic function to extract predictions from various model objects.
+#' @param x A model object.
+#' @param ... Additional arguments passed to specific methods.
+#' @return The predictions from the model.
+#' @export
+pred <- function(x, ...) {
+  UseMethod("pred")
+}
+
+#' Extract Model Predictions
+#' @description
+#' This is a method for the generic function \code{pred} to extract model
+#' predictions from an object of class "linreg". It returns the fitted values from the regression.
+#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param ... Further arguments passed to or from other methods (ignored).
+#' @return A named numeric vector containing the predicted values (ŷ).
+#' @examples
+#' # Create a linreg model
+#' model <- linreg(Petal.Length ~ Sepal.Length, data = iris)
+#' # Extract the predicted values
+#' pred(model)
+#' @export
+pred.linreg <- function(x, ...) {
+  return(x$y_hat[, 1])
+}
+
+#' Extract Model Coefficients
+#' @description
+#' A method for the generic function \code{coef} to extract model coefficients
+#' from an object of class "linreg".
+#' @param x An object of class \code{linreg}, usually the result of a call to \code{linreg()}.
+#' @param ... Further arguments passed to or from other methods (ignored).
+#' @return A named numeric vector containing the regression coefficients.
+#' @examples
+#' model <- linreg(Petal.Length ~ Sepal.Length, data = iris)
+#' coef(model)
+#' @export
+coef.linreg <- function(x, ...) {
+  return(x$beta_hat[, 1])
+}
+
+#' Summarize a Linear Model Fit
+#' @description
+#' Provides a detailed summary of a linear regression model fit, mimicking the
+#' output of `summary.lm()`.
+#' @details
+#' This function prints the model call, a table of coefficients with their standard errors,
+#' t-values, and p-values (with significance stars), along with the residual standard error
+#' and the degrees of freedom for the model.
+#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param ... Further arguments passed to or from other methods (ignored).
+#' @return The original `linreg` object (returned invisibly). The primary purpose
+#' of this function is its side effect: printing the summary to the console.
+#' @examples
+#' model <- linreg(Petal.Length ~ Sepal.Length, data = iris)
+#' summary(model)
+#' @export
+summary.linreg <- function(x, ...) {
+  cat("Call:\n")
+  print(x$call)
+  coefficients_df <- data.frame(matrix(nrow = length(x$beta_hat[, 1]), ncol = 5))
+  colnames(coefficients_df) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)", "")
+  rownames(coefficients_df) <- names(x$beta_hat[, 1])
+  sig_stars <- ifelse(x$p_beta[, 1] < 0.001,
+                      "***",
+                      ifelse(x$p_beta[, 1] < 0.01, "**", ifelse(
+                        x$p_beta[, 1] < 0.05, "*", ifelse(x$p_beta[, 1] < 0.1, ".", " ")
+                      )))
+  coefficients_df[, 1] <- x$beta_hat[, 1] # Estimate
+  coefficients_df[, 2] <- sqrt(diag(x$v_beta_hat)) # Std. Error
+  coefficients_df[, 3] <- x$t_beta[, 1] # t-value
+  coefficients_df[, 4] <- x$p_beta[, 1] # p-value
+  coefficients_df[, 5] <- sig_stars # sig_stars
+  cat("\nCoefficients:\n")
+  print(coefficients_df)
+  cat("---\n")
+  cat("Signif. codes:\n0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
+  cat("Residual standard error:",
+      round(sqrt(x$v_hat), 4),
+      "on",
+      x$df,
+      "degrees of freedom\n")
+  invisible(x)
+}
+
+#' Plot Diagnostics for a Linear Model Fit
+#' @description
+#' Generates two standard diagnostic plots for an object of class "linreg"
+#' using the `ggplot2` framework and arranges them in a single column using `patchwork`.
+#' @details
+#' This function produces two plots to help assess the validity of the linear model assumptions:
+#' \enumerate{
+#'   \item **Residuals vs. Fitted**: Plots the model residuals against the fitted (predicted) values. This is used to detect non-linear patterns in the residuals.
+#'   \item **Scale-Location**: Plots the square root of the absolute value of the standardized residuals against the fitted values. This is used to check for non-constant error variance (heteroscedasticity).
+#' }
+#' Both plots include a standard LOESS smoother (red line) and a robust, median-based quantile regression smoother (purple line) as suggested in the lab assignment. The top 3 most extreme data points are labeled with their row IDs.
+#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param ... Further arguments passed to or from other methods (ignored).
+#' @return The original `linreg` object (returned invisibly). The function's primary
+#' purpose is its side effect: generating and printing the plots.
+#' @examples
+#' model <- linreg(Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
+#' plot(model)
 #' @import ggplot2
 #' @importFrom quantreg rq
 #' @import patchwork
