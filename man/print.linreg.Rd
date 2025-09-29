@@ -18,6 +18,6 @@ The original `linreg` object (returned invisibly).
 Prints coefficients of a `linreg` model object.
 }
 \examples{
-linreg_mod <- linreg(formula = Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
-print(linreg_mod)
+model <- linreg(formula = Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
+print(model)
 }
