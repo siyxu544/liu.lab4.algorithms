@@ -23,37 +23,63 @@
 #' @importFrom stats model.matrix pt
 #' @export
 
-linreg <- function(formula,data){
+linreg <- function(formula, data) {
   current_call <- match.call()
-  if (!is.data.frame(data)){
+  if (!is.data.frame(data)) {
     stop("Invalid input! Argument \"data\" should be a dataframe.")
   }
-  if (!inherits(formula,"formula")){
+  if (!inherits(formula, "formula")) {
     stop("Invalid input! Argument \"formula\" should be a formula, e.g. y ~ x + z")
   }
-  formula_vars <-all.vars(formula)
+  formula_vars <- all.vars(formula)
   #  if(!(attr(terms(formula),"variables") %in% colnames(data))){
-  if (!all(formula_vars %in% colnames(data))){
+  if (!all(formula_vars %in% colnames(data))) {
     stop("Formula contains variable(s) not belonging to data's column names.")
   }
 
-  for(var_name in formula_vars){
-    if(!is.numeric(data[,var_name])){
-      converted_column_value <- suppressWarnings(as.numeric(as.character(data[,var_name])))
-      if (any(is.na(converted_column_value))){
-        stop(paste0("Column '", var_name,"' contains non-numeric value(s) that could not be converted."))}
-      else{
-        data[,var_name] <- converted_column_value
-      }
-    }
+  if (!is.numeric(data[[all.vars(formula)[1]]])) {
+    stop(paste(
+      "The dependent variable (",
+      all.vars(formula)[1],
+      ") must be a numeric vector."
+    ))
   }
-  X <- model.matrix(formula,data)
-  y <-data[,formula_vars[1]]
-  if (nrow(X) <= ncol(X)){
-    if (nrow(X) == ncol(X)){
-      stop(paste0("Degrees of freedom are 0. Cannot perform statistical inference when the number of observations (", nrow(X),") is not greater than the number of parameters (", ncol(X), ")."))
-    }else{
-      stop(paste0("The number of observations (n=", nrow(X),") is less than the number of parameters to estimate (p=", ncol(X), "). You need at least ", ncol(X)+1," data points to fit this model and perform statistical inference."))
+  # Comment the following code that causes a bug
+  # for(var_name in formula_vars){
+  #   if(!is.numeric(data[,var_name])){
+  #     converted_column_value <- suppressWarnings(as.numeric(as.character(data[,var_name])))
+  #     if (any(is.na(converted_column_value))){
+  #       stop(paste0("Column '", var_name,"' contains non-numeric value(s) that could not be converted."))}
+  #     else{
+  #       data[,var_name] <- converted_column_value
+  #     }
+  #   }
+  # }
+  X <- model.matrix(formula, data)
+  y <- data[, formula_vars[1]]
+  if (nrow(X) <= ncol(X)) {
+    if (nrow(X) == ncol(X)) {
+      stop(
+        paste0(
+          "Degrees of freedom are 0. Cannot perform statistical inference when the number of observations (",
+          nrow(X),
+          ") is not greater than the number of parameters (",
+          ncol(X),
+          ")."
+        )
+      )
+    } else{
+      stop(
+        paste0(
+          "The number of observations (n=",
+          nrow(X),
+          ") is less than the number of parameters to estimate (p=",
+          ncol(X),
+          "). You need at least ",
+          ncol(X) + 1,
+          " data points to fit this model and perform statistical inference."
+        )
+      )
     }
   }
   # Regressions coefficients:
@@ -65,19 +91,26 @@ linreg <- function(formula,data){
   # The degrees of freedom:
   df <- nrow(X) - ncol(X)
   # The residual of variance:
-  v_hat <- (t(e_hat)%*%e_hat)/df
+  v_hat <- (t(e_hat) %*% e_hat) / df
   # The variance of the regression coefficients:
   v_hat <- v_hat[1, 1]
   v_beta_hat <- v_hat * solve(t(X) %*% X)
   # The t-values for each coefficient:
-  t_beta = beta_hat/(sqrt(diag(v_beta_hat)))
+  t_beta = beta_hat / (sqrt(diag(v_beta_hat)))
   # The p-values for each coefficient:
-  p_beta = pt(t_beta,df)
+  p_beta = pt(t_beta, df)
 
-  result<-list(beta_hat=beta_hat,y_hat=y_hat,e_hat=e_hat,df=df,v_hat=v_hat,v_beta_hat=v_beta_hat,t_beta=t_beta,p_beta=p_beta,call=current_call)
+  result <- list(
+    beta_hat = beta_hat,
+    y_hat = y_hat,
+    e_hat = e_hat,
+    df = df,
+    v_hat = v_hat,
+    v_beta_hat = v_beta_hat,
+    t_beta = t_beta,
+    p_beta = p_beta,
+    call = current_call
+  )
   class(result) <- "linreg"
   return(result)
 }
-
-
-
