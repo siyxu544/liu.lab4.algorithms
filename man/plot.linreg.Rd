@@ -28,6 +28,9 @@ This function produces two plots to help assess the validity of the linear model
 Both plots include a standard LOESS smoother (red line) and a robust, median-based quantile regression smoother (purple line) as suggested in the lab assignment. The top 3 most extreme data points are labeled with their row IDs.
 }
 \examples{
+library(quantreg)
+library(ggplot2)
+library(patchwork)
 model <- linreg(Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
 plot(model)
 }

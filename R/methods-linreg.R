@@ -17,7 +17,7 @@ print.linreg <- function(x, ...) {
 
 #' Extract Model Residuals
 #' @description Extracts the vector of residuals from a model object of class "linreg".
-#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param object An object of class `linreg`, usually the result of a call to `linreg()`.
 #' @param ... Further arguments passed to or from other methods (ignored).
 #' @return A named numeric vector containing the residual values (y - ŷ).
 #' @examples
@@ -26,17 +26,17 @@ print.linreg <- function(x, ...) {
 #' # Extract the residuals
 #' residuals(model)
 #' @export
-residuals.linreg <- function(x, ...) {
-  return(x$e_hat[, 1])
+residuals.linreg <- function(object, ...) {
+  return(object$e_hat[, 1])
 }
 
 #' Generic function for model predictions
 #' This is a generic function to extract predictions from various model objects.
-#' @param x A model object.
+#' @param object A model object.
 #' @param ... Additional arguments passed to specific methods.
 #' @return The predictions from the model.
 #' @export
-pred <- function(x, ...) {
+pred <- function(object, ...) {
   UseMethod("pred")
 }
 
@@ -44,7 +44,7 @@ pred <- function(x, ...) {
 #' @description
 #' This is a method for the generic function \code{pred} to extract model
 #' predictions from an object of class "linreg". It returns the fitted values from the regression.
-#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param object An object of class `linreg`, usually the result of a call to `linreg()`.
 #' @param ... Further arguments passed to or from other methods (ignored).
 #' @return A named numeric vector containing the predicted values (ŷ).
 #' @examples
@@ -53,23 +53,23 @@ pred <- function(x, ...) {
 #' # Extract the predicted values
 #' pred(model)
 #' @export
-pred.linreg <- function(x, ...) {
-  return(x$y_hat[, 1])
+pred.linreg <- function(object, ...) {
+  return(object$y_hat[, 1])
 }
 
 #' Extract Model Coefficients
 #' @description
 #' A method for the generic function \code{coef} to extract model coefficients
 #' from an object of class "linreg".
-#' @param x An object of class \code{linreg}, usually the result of a call to \code{linreg()}.
+#' @param object An object of class \code{linreg}, usually the result of a call to \code{linreg()}.
 #' @param ... Further arguments passed to or from other methods (ignored).
 #' @return A named numeric vector containing the regression coefficients.
 #' @examples
 #' model <- linreg(Petal.Length ~ Sepal.Length, data = iris)
 #' coef(model)
 #' @export
-coef.linreg <- function(x, ...) {
-  return(x$beta_hat[, 1])
+coef.linreg <- function(object, ...) {
+  return(object$beta_hat[, 1])
 }
 
 #' Summarize a Linear Model Fit
@@ -80,7 +80,7 @@ coef.linreg <- function(x, ...) {
 #' This function prints the model call, a table of coefficients with their standard errors,
 #' t-values, and p-values (with significance stars), along with the residual standard error
 #' and the degrees of freedom for the model.
-#' @param x An object of class `linreg`, usually the result of a call to `linreg()`.
+#' @param object An object of class `linreg`, usually the result of a call to `linreg()`.
 #' @param ... Further arguments passed to or from other methods (ignored).
 #' @return The original `linreg` object (returned invisibly). The primary purpose
 #' of this function is its side effect: printing the summary to the console.
@@ -88,32 +88,32 @@ coef.linreg <- function(x, ...) {
 #' model <- linreg(Petal.Length ~ Sepal.Length, data = iris)
 #' summary(model)
 #' @export
-summary.linreg <- function(x, ...) {
+summary.linreg <- function(object, ...) {
   cat("Call:\n")
-  print(x$call)
-  coefficients_df <- data.frame(matrix(nrow = length(x$beta_hat[, 1]), ncol = 5))
+  print(object$call)
+  coefficients_df <- data.frame(matrix(nrow = length(object$beta_hat[, 1]), ncol = 5))
   colnames(coefficients_df) <- c("Estimate", "Std. Error", "t value", "Pr(>|t|)", "")
-  rownames(coefficients_df) <- names(x$beta_hat[, 1])
-  sig_stars <- ifelse(x$p_beta[, 1] < 0.001,
+  rownames(coefficients_df) <- names(object$beta_hat[, 1])
+  sig_stars <- ifelse(object$p_beta[, 1] < 0.001,
                       "***",
-                      ifelse(x$p_beta[, 1] < 0.01, "**", ifelse(
-                        x$p_beta[, 1] < 0.05, "*", ifelse(x$p_beta[, 1] < 0.1, ".", " ")
+                      ifelse(object$p_beta[, 1] < 0.01, "**", ifelse(
+                        object$p_beta[, 1] < 0.05, "*", ifelse(object$p_beta[, 1] < 0.1, ".", " ")
                       )))
-  coefficients_df[, 1] <- x$beta_hat[, 1] # Estimate
-  coefficients_df[, 2] <- sqrt(diag(x$v_beta_hat)) # Std. Error
-  coefficients_df[, 3] <- x$t_beta[, 1] # t-value
-  coefficients_df[, 4] <- x$p_beta[, 1] # p-value
+  coefficients_df[, 1] <- object$beta_hat[, 1] # Estimate
+  coefficients_df[, 2] <- sqrt(diag(object$v_beta_hat)) # Std. Error
+  coefficients_df[, 3] <- object$t_beta[, 1] # t-value
+  coefficients_df[, 4] <- object$p_beta[, 1] # p-value
   coefficients_df[, 5] <- sig_stars # sig_stars
   cat("\nCoefficients:\n")
   print(coefficients_df)
   cat("---\n")
   cat("Signif. codes:\n0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\n")
   cat("Residual standard error:",
-      round(sqrt(x$v_hat), 4),
+      round(sqrt(object$v_hat), 4),
       "on",
-      x$df,
+      object$df,
       "degrees of freedom\n")
-  invisible(x)
+  invisible(object)
 }
 
 #' Plot Diagnostics for a Linear Model Fit
@@ -132,6 +132,9 @@ summary.linreg <- function(x, ...) {
 #' @return The original `linreg` object (returned invisibly). The function's primary
 #' purpose is its side effect: generating and printing the plots.
 #' @examples
+#' library(quantreg)
+#' library(ggplot2)
+#' library(patchwork)
 #' model <- linreg(Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
 #' plot(model)
 #' @import ggplot2
@@ -177,7 +180,7 @@ plot.linreg <- function(x, ...) {
   y_breaks1 <- pretty(y_axis_range1)
   y_breaks2 <- pretty(y_axis_range2)
   # Create the plot AND ASSIGN IT TO A VARIABLE
-  plot1 <- ggplot(data = plot_data, aes(x = fitted_values, y = residuals)) +
+  plot1 <- ggplot(data = plot_data, aes(x = .data$fitted_values, y = .data$residuals)) +
     geom_point(shape = 1, size = 3) +
     geom_hline(yintercept = 0,
                linetype = "dotted",
@@ -197,7 +200,7 @@ plot.linreg <- function(x, ...) {
     ) +
     geom_text(
       data = top_outliers1,
-      aes(label = row_id),
+      aes(label = .data$row_id),
       nudge_x = 0.1,
       hjust = 0
     ) + # Add outlier labels
@@ -223,7 +226,7 @@ plot.linreg <- function(x, ...) {
       plot.caption = element_text(hjust = 0.5)  # Center the caption
     )
 
-  plot2 <- ggplot(data = plot_data, aes(x = fitted_values, y = sqrt_std_res)) +
+  plot2 <- ggplot(data = plot_data, aes(x = .data$fitted_values, y = .data$sqrt_std_res)) +
     geom_point(shape = 1, size = 3) +
     geom_hline(yintercept = 0,
                linetype = "dotted",
@@ -243,7 +246,7 @@ plot.linreg <- function(x, ...) {
     ) +
     geom_text(
       data = top_outliers2,
-      aes(label = row_id),
+      aes(label = .data$row_id),
       nudge_x = 0.1,
       hjust = 0
     ) +

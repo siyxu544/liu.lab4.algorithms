@@ -4,10 +4,10 @@
 \alias{residuals.linreg}
 \title{Extract Model Residuals}
 \usage{
-\method{residuals}{linreg}(x, ...)
+\method{residuals}{linreg}(object, ...)
 }
 \arguments{
-\item{x}{An object of class `linreg`, usually the result of a call to `linreg()`.}
+\item{object}{An object of class `linreg`, usually the result of a call to `linreg()`.}
 
 \item{...}{Further arguments passed to or from other methods (ignored).}
 }

@@ -4,10 +4,10 @@
 \alias{coef.linreg}
 \title{Extract Model Coefficients}
 \usage{
-\method{coef}{linreg}(x, ...)
+\method{coef}{linreg}(object, ...)
 }
 \arguments{
-\item{x}{An object of class \code{linreg}, usually the result of a call to \code{linreg()}.}
+\item{object}{An object of class \code{linreg}, usually the result of a call to \code{linreg()}.}
 
 \item{...}{Further arguments passed to or from other methods (ignored).}
 }

@@ -4,10 +4,10 @@
 \alias{summary.linreg}
 \title{Summarize a Linear Model Fit}
 \usage{
-\method{summary}{linreg}(x, ...)
+\method{summary}{linreg}(object, ...)
 }
 \arguments{
-\item{x}{An object of class `linreg`, usually the result of a call to `linreg()`.}
+\item{object}{An object of class `linreg`, usually the result of a call to `linreg()`.}
 
 \item{...}{Further arguments passed to or from other methods (ignored).}
 }

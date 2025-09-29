@@ -4,10 +4,10 @@
 \alias{pred.linreg}
 \title{Extract Model Predictions}
 \usage{
-\method{pred}{linreg}(x, ...)
+\method{pred}{linreg}(object, ...)
 }
 \arguments{
-\item{x}{An object of class `linreg`, usually the result of a call to `linreg()`.}
+\item{object}{An object of class `linreg`, usually the result of a call to `linreg()`.}
 
 \item{...}{Further arguments passed to or from other methods (ignored).}
 }

@@ -5,10 +5,10 @@
 \title{Generic function for model predictions
 This is a generic function to extract predictions from various model objects.}
 \usage{
-pred(x, ...)
+pred(object, ...)
 }
 \arguments{
-\item{x}{A model object.}
+\item{object}{A model object.}
 
 \item{...}{Additional arguments passed to specific methods.}
 }
