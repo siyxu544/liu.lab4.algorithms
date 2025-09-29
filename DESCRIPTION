@@ -17,3 +17,7 @@ Suggests:
     testthat (>= 3.0.0)
 RoxygenNote: 7.3.2
 Config/testthat/edition: 3
+Imports: 
+    ggplot2,
+    quantreg,
+    patchwork
