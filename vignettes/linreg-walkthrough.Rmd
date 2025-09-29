@@ -1,0 +1,90 @@
+---
+title: "Using the linreg Package for Linear Regression"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the linreg Package for Linear Regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This vignette provides a simple walkthrough of the `linreg` package, which performs linear regression using Ordinary Least Squares. We will use the well-known `iris` dataset for this demonstration.
+
+### 1. Loading the Package and Data
+
+First, we load required packages and the `iris` dataset.
+
+```{r setup,message=FALSE,warning=FALSE}
+library(liu.lab4.algorithms)
+library(ggplot2)             # Needed for the plot object
+library(quantreg)            # Needed for the rq method in geom_smooth
+library(patchwork)           # Needed for combining plots to one graphic
+data("iris")
+```
+
+### 2. Fitting a Linear Model
+
+Next, we use the `linreg()` function to fit a model. We will predict `Petal.Length` using `Sepal.Length` and `Sepal.Width` as predictors.
+
+```{r}
+linreg_model <- linreg(formula = Petal.Length ~ Sepal.Length + Sepal.Width, data = iris)
+```
+
+### 3. Using the S3 Methods
+
+The `linreg` object comes with several methods to inspect the results.
+
+#### Printing the Model
+
+The `print()` method provides a concise summary of the call and the estimated coefficients. You can call it explicitly or just by typing the object's name.
+
+```{r}
+# This will automatically call the print.linreg method
+linreg_model
+```
+
+#### Extracting Coefficients
+
+The `coef()` method returns the coefficients as a named vector.
+
+```{r}
+coef(linreg_model)
+```
+
+#### Extracting Residuals
+
+The `resid()` method returns the model residuals.
+
+```{r}
+head(resid(linreg_model)) # Show only the first few for brevity
+```
+
+#### Extracting Predicted Values
+
+The `pred()` method returns the fitted (predicted) values.
+
+```{r}
+head(pred(linreg_model)) # Show only the first few for brevity
+```
+
+#### Plotting Diagnostics
+
+The `plot()` method generates two diagnostic plots: "Residuals vs Fitted" and "Scale-Location".
+
+```{r, fig.width = 7, fig.height = 10}
+plot(linreg_model)
+```
+
+#### Viewing the Detailed Summary
+
+Finally, the `summary()` method provides a detailed statistical summary of the model, including standard errors, t-values, and p-values for the coefficients.
+
+```{r}
+summary(linreg_model)
+```
