@@ -41,7 +41,7 @@ linreg <- function(formula, data) {
     stop(paste(
       "The dependent variable (",
       all.vars(formula)[1],
-      ") must be a numeric vector."
+      ") must be numeric."
     ))
   }
   # Comment the following code that causes a bug
@@ -83,7 +83,13 @@ linreg <- function(formula, data) {
     }
   }
   # Regressions coefficients:
-  beta_hat <- (solve(t(X) %*% X)) %*% t(X) %*% y
+  #   beta_hat <- (solve(t(X) %*% X)) %*% t(X) %*% y
+  QR <- qr(X) # Perform the QR decomposition on the design matrix X
+  p <- QR$rank # The number of parameters
+  Qty <- qr.qty(QR, y) # Calculate Q^T * y
+  beta_hat_vector <- backsolve(qr.R(QR), Qty[1:p]) # Solve R * beta_hat = Q^T * y using back substitution
+  names(beta_hat_vector) <- colnames(X)
+  beta_hat <- as.matrix(beta_hat_vector)
   # The fitted values:
   y_hat <- X %*% beta_hat
   # The residuals:
@@ -92,13 +98,17 @@ linreg <- function(formula, data) {
   df <- nrow(X) - ncol(X)
   # The residual of variance:
   v_hat <- (t(e_hat) %*% e_hat) / df
-  # The variance of the regression coefficients:
   v_hat <- v_hat[1, 1]
-  v_beta_hat <- v_hat * solve(t(X) %*% X)
+  # The variance of the regression coefficients:
+  #  v_beta_hat <- v_hat * solve(t(X) %*% X)
+  R_matrix <- qr.R(QR)
+  R_inverse <- backsolve(R_matrix, diag(ncol(X)))
+  XtX_inverse <- R_inverse %*% t(R_inverse)
+  v_beta_hat <- v_hat * XtX_inverse
   # The t-values for each coefficient:
-  t_beta = beta_hat / (sqrt(diag(v_beta_hat)))
+  t_beta <- (beta_hat / (sqrt(diag(v_beta_hat))))
   # The p-values for each coefficient:
-  p_beta = pt(t_beta, df)
+  p_beta <- (2 * pt(abs(t_beta), df, lower.tail = FALSE))
 
   result <- list(
     beta_hat = beta_hat,
