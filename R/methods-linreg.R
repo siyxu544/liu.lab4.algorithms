@@ -20,6 +20,23 @@ print.linreg <- function(x, ...) {
 #' @import patchwork
 #' @export
 plot.linreg <- function(x, ...) {
+  # Check for residuals (e_hat)
+  if (is.null(x$e_hat) || !is.numeric(x$e_hat)) {
+    stop("The linreg object 'x' is missing or has a non-numeric 'e_hat' component.")
+  }
+
+  # Check for fitted values (y_hat)
+  if (is.null(x$y_hat) || !is.numeric(x$y_hat)) {
+    stop("The linreg object 'x' is missing or has a non-numeric 'y_hat' component.")
+  }
+
+  # Check for residual variance (v_hat)
+  if (is.null(x$v_hat) ||
+      !is.numeric(x$v_hat) || length(x$v_hat) != 1 || x$v_hat < 0) {
+    stop(
+      "The linreg object 'x' must have a 'v_hat' component that is a single, non-negative number."
+    )
+  }
   plot_data <- data.frame(
     residuals = x$e_hat,
     sqrt_std_res = sqrt(abs((x$e_hat / (
